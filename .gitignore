@@ -1,0 +1,29 @@
+# 敏感文件(不上传公开仓库)
+单方保密协议*
+CameraSDK_MediaSDK/
+Link SDK/
+
+# 大体积压缩包
+*.zip
+
+# 浏览器自动化产物
+tactile-vision/output/
+.playwright-mcp/
+
+# 缓存与依赖
+__pycache__/
+*.pyc
+node_modules/
+
+# 临时与工具目录
+tmp/
+.tactile-scratch/
+.ai-bridge/
+.vscode/
+
+# 构建产物
+build-ninja/
+build/
+*.o
+*.obj
+*.exe

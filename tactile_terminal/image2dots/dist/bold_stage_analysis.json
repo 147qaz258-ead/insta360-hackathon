@@ -1,0 +1,37 @@
+{
+  "source": "E:\\C_Projects\\影石黑客松\\tactile_terminal\\image2dots\\dist\\bold_stage.stl",
+  "vertices": 85886,
+  "edges": 257652,
+  "triangles": 171768,
+  "faces": 171768,
+  "boundary_edges": 0,
+  "nonmanifold_edges": 0,
+  "connected_components": 1,
+  "watertight": true,
+  "bounds_min_mm": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "bounds_max_mm": [
+    240.0,
+    123.0,
+    11.0
+  ],
+  "dimensions_mm": [
+    240.0,
+    123.0,
+    11.0
+  ],
+  "volume_mm3": 135263.99999999965,
+  "volume_cm3": 135.26399999999964,
+  "petg_mass_g_at_1_27": 171.78527999999955,
+  "unique_z_mm": [
+    0.0,
+    3.0,
+    4.0,
+    6.0,
+    8.0,
+    11.0
+  ]
+}

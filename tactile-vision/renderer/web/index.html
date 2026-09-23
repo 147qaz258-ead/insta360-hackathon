@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>通用 AI 触觉表面</title>
+  <link rel="stylesheet" href="/ui.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">MODEL-AUTHORITATIVE · SPARSE-RUNS-V1 · 80 × 48 DIGITAL TWIN</p>
+        <h1>把任意图片变成可以触摸的表面</h1>
+        <p class="subtitle">qwen3.8-max 一次性设计全局稀疏点段；候选经正式渲染页回看、无原图盲读与独立 Critic 评审通过后才发布到页面与硬件。</p>
+      </div>
+      <div class="header-actions">
+        <span id="apiPill" class="status-pill"><i></i><span id="apiText">检查模型连接…</span></span>
+        <button id="openDisplay" class="secondary">打开 RDK 展示页</button>
+      </div>
+    </header>
+
+    <section class="state-strip" aria-label="运行状态">
+      <div class="state-step active" data-state="UNDERSTANDING"><b>01</b><span>整图理解</span></div>
+      <div class="state-step" data-state="DESIGNING"><b>02</b><span>全局点位设计</span></div>
+      <div class="state-step" data-state="VALIDATING"><b>03</b><span>协议检查</span></div>
+      <div class="state-step" data-state="RENDERING"><b>04</b><span>页面渲染回看</span></div>
+      <div class="state-step" data-state="BLIND_READING"><b>05</b><span>无原图盲读</span></div>
+      <div class="state-step" data-state="CRITIQUING"><b>06</b><span>Critic 质量评审</span></div>
+      <div class="state-step" data-state="READY"><b>07</b><span>发布与触摸</span></div>
+    </section>
+
+    <section class="workspace">
+      <article class="panel input-panel">
+        <div class="panel-head">
+          <div><p class="panel-kicker">INPUT</p><h2>原始图片</h2></div>
+          <span id="inputSize" class="tag">等待图片</span>
+        </div>
+        <div id="dropZone" class="image-stage">
+          <canvas id="inputCanvas" width="800" height="480"></canvas>
+          <div id="emptyInput" class="empty-state">
+            <span class="upload-symbol">＋</span>
+            <strong>选择或拖入任意图片</strong>
+            <small>照片、地图、图表、文档、UI、插画均可</small>
+          </div>
+        </div>
+        <textarea id="userInstruction" rows="2" placeholder="可选：告诉智能体本次更希望突出什么；留空则由它自主设计。"></textarea>
+        <div class="button-row">
+          <label class="button primary">选择图片<input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden /></label>
+          <button id="generateButton" class="primary" disabled>生成触觉表面</button>
+          <button id="changeButton" class="secondary">换一张</button>
+        </div>
+      </article>
+
+      <article class="panel surface-panel">
+        <div class="panel-head">
+          <div><p class="panel-kicker">TACTILE SURFACE</p><h2>最终硬件数字孪生</h2></div>
+          <div class="view-buttons">
+            <span class="surface-rule">白色升起 · 黑色落下 · 主视图严格俯视</span>
+          </div>
+        </div>
+        <div id="surface" class="surface-stage" aria-label="80 × 48 触觉阵列"></div>
+        <div class="surface-meta">
+          <span id="surfaceStatus">IDLE · 等待生成</span>
+          <span id="frameIdentity">Frame #0 · 80 × 48</span>
+        </div>
+        <div class="inspect-grid">
+          <div class="aux-output">
+            <div class="matrix-output-head"><span>2.5D 高度辅图 · 固定角度</span></div>
+            <div id="surfaceAux" class="aux-stage" aria-label="2.5D 高度辅图"></div>
+          </div>
+          <div class="matrix-output">
+            <div class="matrix-output-head">
+              <span>模型逐点输出 · 高度与区域轮廓</span>
+              <span id="matrixStats">0 / 3840 个点</span>
+            </div>
+            <canvas id="heightMap" width="800" height="480" aria-label="80×48 高度矩阵和区域边界"></canvas>
+            <div class="matrix-legend"><span class="legend-swatch"></span>高度分析图：灰度表示模型的 0–255 高度；细线表示 region_rows 边界。实体预览中白色为升起、黑色为落下</div>
+          </div>
+        </div>
+        <div class="button-row surface-actions">
+          <button id="lowerButton">全部落下</button>
+          <button id="replayButton">重新升起</button>
+          <span class="touch-hint">点击任意凸点即可听取说明</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="lower-grid">
+      <article class="card explanation-card">
+        <div class="card-head"><div><p class="panel-kicker">AI EXPLANATION</p><h3>图片与触觉设计</h3></div><span id="candidateBadge" class="tag">候选 — / 3</span></div>
+        <p id="sceneSummary" class="summary">上传图片后，智能体会直接输出完整点阵。</p>
+        <div id="regionList" class="region-list"></div>
+      </article>
+
+      <article class="card conversation-card">
+        <div class="card-head"><div><p class="panel-kicker">TOUCH · VOICE · FOLLOW-UP</p><h3>触摸语音与追问</h3></div><span id="touchPosition" class="tag">尚未触摸</span></div>
+        <div id="chatLog" class="chat-log"><div class="chat-row system">触觉表面准备完成后，点击凸点开始探索。</div></div>
+        <div class="chat-input-row"><input id="chatInput" placeholder="例如：这个地方是什么？它和左边有什么关系？" /><button id="chatSend" class="primary">发送</button></div>
+      </article>
+    </section>
+
+    <details class="developer-panel">
+      <summary>开发者信息：候选点段、审查截图、盲读与评分、工具错误、帧矩阵与 RDK 地址</summary>
+      <div class="developer-grid">
+        <dl class="metrics">
+          <div><dt>Model</dt><dd id="providerModel">—</dd></div>
+          <div><dt>Device</dt><dd id="device">—</dd></div>
+          <div><dt>Contract</dt><dd>80 × 48 · UInt8 · sparse-runs-v1</dd></div>
+          <div><dt>Checksum</dt><dd id="checksum">—</dd></div>
+        </dl>
+        <div class="board-url"><span>RDK 展示地址</span><code id="boardUrl">—</code><button id="copyBoardUrl" class="compact">复制</button></div>
+      </div>
+      <div id="candidateReview" class="candidate-review"></div>
+      <pre id="developerTrace">等待运行…</pre>
+    </details>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

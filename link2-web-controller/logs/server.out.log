@@ -1,0 +1,116 @@
+Link 2 Web Controller 已启动
+请打开: http://127.0.0.1:8765
+按 Ctrl+C 退出
+[09-22 10:14:57.738]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:14:57.742]  25016 32868 I dshow_helper.hpp:0166:  FindCaptureDevice matched candidate friendly_name: Insta360 Link 2, unique_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:15:02.879]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:02.910]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:07.740]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:12.747]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:17.747]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:21.890]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:22.735]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:27.753]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:28.319]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:32.739]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:37.736]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:42.748]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:47.739]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:51.887]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:52.737]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:15:57.744]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:02.752]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:07.743]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:12.744]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:17.744]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:21.880]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:22.738]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:27.742]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:31.978]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:32.746]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:37.748]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:42.749]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:47.747]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:51.892]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:52.744]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:16:57.740]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:01.992]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:02.736]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:07.750]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:12.745]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:17.750]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:26.851]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:26.876]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:27.833]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:27.858]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:31.992]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:32.114]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:32.737]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:37.758]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:42.739]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:17:47.880]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:47.932]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:47.960]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:47.984]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:52.715]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:52.718]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:52.722]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:52.726]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:52.731]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:57.709]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:57.734]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:57.738]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:57.743]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:57.747]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:57.819]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:57.823]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:57.827]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:57.830]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:57.833]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:59.248]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:59.251]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:59.255]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:17:59.262]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:19:42.722]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:19:42.730]  25016 32868 I dshow_helper.hpp:0166:  FindCaptureDevice matched candidate friendly_name: Insta360 Link 2, unique_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:19:45.924]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:19:53.816]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:19:53.824]  25016 32868 I dshow_helper.hpp:0166:  FindCaptureDevice matched candidate friendly_name: Insta360 Link 2, unique_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:19:58.020]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:19:58.054]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:19:58.099]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:19:58.129]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:19:58.161]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:19:58.186]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:19:58.219]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:19:58.250]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:20:07.709]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:20:07.718]  25016 32868 I dshow_helper.hpp:0166:  FindCaptureDevice matched candidate friendly_name: Insta360 Link 2, unique_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:20:11.907]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:20:12.746]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:20:17.734]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:20:17.761]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:20:22.747]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:20:27.798]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:20:32.735]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:21:33.292]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:21:34.997]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:21:49.887]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:21:49.892]  25016 32868 I dshow_helper.hpp:0166:  FindCaptureDevice matched candidate friendly_name: Insta360 Link 2, unique_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:21:54.351]  25016 32868 I uvc_camera_win.cc:2070:  value mask: 00001001000111101110001000000000
+[09-22 10:21:54.353]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000111110101
+[09-22 10:21:54.376]  25016 32868 I uvc_camera_win.cc:2070:  value mask: 00001001000111101110001000000000
+[09-22 10:21:54.377]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000111110101
+[09-22 10:21:54.400]  25016 32868 I uvc_camera_win.cc:2070:  value mask: 00001001000111101110001000000000
+[09-22 10:21:54.401]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000111110101
+[09-22 10:21:57.037]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000111110101
+[09-22 10:22:03.306]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000111110101
+[09-22 10:22:13.304]  25016 32868 I dshow_helper.hpp:0100:  FindCaptureDevice target friendly_name: Insta360 Link 2, display_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:22:13.312]  25016 32868 I dshow_helper.hpp:0166:  FindCaptureDevice matched candidate friendly_name: Insta360 Link 2, unique_name: @device:pnp:\\?\usb#vid_2e1a&pid_4c04&mi_00#6&1af69d02&0&0000#{65e8773d-8f56-11d0-a3b9-00a0c9223196}\global
+[09-22 10:22:17.540]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:22:17.569]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:22:18.103]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:28:33.309]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:29:03.305]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:29:33.309]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101
+[09-22 10:30:03.299]  25016 32868 I uvc_camera_win.cc:2344:  modify after 0000000001110101

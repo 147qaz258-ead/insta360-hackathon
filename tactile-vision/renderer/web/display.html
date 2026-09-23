@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tactile Surface · RDK Display</title>
+  <link rel="stylesheet" href="/display.css" />
+</head>
+<body>
+  <main class="display-shell">
+    <div id="displaySurface"></div>
+    <div class="display-hud">
+      <div>
+        <span class="live-dot"></span>
+        <strong>TACTILE SURFACE</strong>
+      </div>
+      <span id="displayStatus">等待 PC 端帧…</span>
+      <span id="displayMode">白色=升起 · 黑色=落下 · 阴影表示高度</span>
+      <span id="displayGrid">—</span>
+    </div>
+  </main>
+  <script type="module" src="/display.js"></script>
+</body>
+</html>

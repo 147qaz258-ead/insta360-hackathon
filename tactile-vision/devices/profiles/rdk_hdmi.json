@@ -1,0 +1,9 @@
+{
+  "name": "rdk_hdmi",
+  "screen_px_width": 800,
+  "screen_px_height": 480,
+  "target_pin_count": 3840,
+  "aspect_mode": "preserve",
+  "height_levels": 256,
+  "grid_align": 2
+}

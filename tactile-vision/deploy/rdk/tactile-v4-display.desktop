@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Tactile Vision V4 Display
+Comment=Open the read-only 80x48 tactile surface from the PC runtime
+Exec=/home/sunrise/tactile-v4/rdk_launch_display.sh http://127.0.0.1:18765/display.html
+Terminal=false
+StartupNotify=false
+X-GNOME-Autostart-enabled=true

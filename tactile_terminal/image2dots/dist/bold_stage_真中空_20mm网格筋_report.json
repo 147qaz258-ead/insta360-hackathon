@@ -1,0 +1,22 @@
+{
+  "dimensions_mm": [
+    240,
+    123,
+    11.0
+  ],
+  "top_surface_preserved": true,
+  "base_top_z_mm": 3.0,
+  "bottom_skin_mm": 0.6,
+  "top_carrier_skin_mm": 0.8,
+  "internal_clear_height_mm": 1.6,
+  "grid_rib_pitch_mm": 20,
+  "grid_rib_width_mm": 1,
+  "triangles": 1273368,
+  "volume_mm3": 93496.0,
+  "volume_reduction_percent": 30.878873905843385,
+  "petg_theoretical_mass_g": 118.73992,
+  "source_volume_mm3": 135264.0,
+  "source_petg_theoretical_mass_g": 171.78528000000003,
+  "stl": "tactile_terminal\\image2dots\\dist\\bold_stage_真中空_20mm网格筋.stl",
+  "3mf": "tactile_terminal\\image2dots\\dist\\bold_stage_真中空_20mm网格筋.3mf"
+}

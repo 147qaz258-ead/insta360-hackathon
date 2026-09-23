@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>触觉页面模拟器</title>
+<style>
+  html, body { margin: 0; height: 100%; }
+  body {
+    display: grid;
+    place-items: center;
+    background: radial-gradient(120vmax 90vmax at 50% 38%, #35383c 0%, #26282b 55%, #1e2022 100%);
+    overflow: hidden;
+  }
+  canvas {
+    max-width: 94vw;
+    max-height: 92vh;
+    box-shadow: 0 24px 70px rgba(0,0,0,.55), 0 6px 18px rgba(0,0,0,.45);
+  }
+</style>
+</head>
+<body>
+<canvas id="page"></canvas>
+<script>
+"use strict";
+
+/* ================= 触觉页面内容：硬编码的固定点阵布局 =================
+   网格 168 x 114，每个单元一个正方形凸点。
+   level: 0 = 平齐（压平的点），1 = 半凸，2 = 全凸。信息只由高度表达。 */
+
+const COLS = 168, ROWS = 114, MARGIN = 4;
+const level = new Uint8Array(COLS * ROWS);
+
+function setCell(x, y, lv) {
+  if (x >= 0 && y >= 0 && x < COLS && y < ROWS) level[y * COLS + x] = lv;
+}
+function fillRect(x, y, w, h, lv) {
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) setCell(x + i, y + j, lv);
+}
+function outlineRect(x, y, w, h, lv) {
+  fillRect(x, y, w, 1, lv); fillRect(x, y + h - 1, w, 1, lv);
+  fillRect(x, y, 1, h, lv); fillRect(x + w - 1, y, 1, h, lv);
+}
+function insideEllipse(x, y, cx, cy, rx, ry) {
+  return ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1;
+}
+function fillEllipse(cx, cy, rx, ry, lv, clip) {
+  for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++)
+    for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++)
+      if (insideEllipse(x, y, cx, cy, rx, ry))
+        if (!clip || (x >= clip.x0 && x <= clip.x1 && y >= clip.y0 && y <= clip.y1))
+          setCell(x, y, lv);
+}
+function ellipseRim(cx, cy, rx, ry) {
+  for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++)
+    for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
+      if (!insideEllipse(x, y, cx, cy, rx, ry)) continue;
+      const boundary = [[1,0],[-1,0],[0,1],[0,-1]]
+        .some(([dx, dy]) => !insideEllipse(x + dx, y + dy, cx, cy, rx, ry));
+      if (boundary) { setCell(x, y, 2); continue; }
+      const ring = [[1,0],[-1,0],[0,1],[0,-1]]
+        .some(([dx, dy]) => insideEllipse(x + dx, y + dy, cx, cy, rx, ry) &&
+          [[1,0],[-1,0],[0,1],[0,-1]]
+            .some(([ax, ay]) => !insideEllipse(x + dx + ax, y + dy + ay, cx, cy, rx, ry)));
+      setCell(x, y, ring ? 1 : 0);
+    }
+}
+function line(x0, y0, x1, y1, w, lv) {
+  const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) * 2;
+  for (let i = 0; i <= n; i++) {
+    const x = Math.round(x0 + (x1 - x0) * i / n);
+    const y = Math.round(y0 + (y1 - y0) * i / n);
+    fillRect(x, y, w, 1, lv);
+  }
+}
+
+const F57 = {
+  B: ["####.", "#...#", "#...#", "####.", "#...#", "#...#", "####."],
+  O: [".###.", "#...#", "#...#", "#...#", "#...#", "#...#", ".###."],
+  L: ["#....", "#....", "#....", "#....", "#....", "#....", "####."],
+  D: ["####.", "#...#", "#...#", "#...#", "#...#", "#...#", "####."],
+  M: ["#...#", "##.##", "#.#.#", "#.#.#", "#...#", "#...#", "#...#"],
+  A: [".###.", "#...#", "#...#", "#####", "#...#", "#...#", "#...#"],
+  K: ["#...#", "#..#.", "#.#..", "##...", "#.#..", "#..#.", "#...#"],
+  E: ["#####", "#....", "#....", "####.", "#....", "#....", "#####"],
+  R: ["####.", "#...#", "#...#", "####.", "#.#..", "#..#.", "#...#"],
+  2: [".###.", "#...#", "....#", "..##.", ".#...", "#....", "#####"],
+  0: [".###.", "#...#", "#..##", "#.#.#", "##..#", "#...#", ".###."],
+  6: ["..##.", ".#..#", "#....", "####.", "#...#", "#...#", ".###."],
+};
+const F35 = {
+  B: ["##.", "#.#", "##.", "#.#", "##."],
+  O: [".#.", "#.#", "#.#", "#.#", ".#."],
+  L: ["#..", "#..", "#..", "#..", "###"],
+  D: ["##.", "#.#", "#.#", "#.#", "##."],
+  M: ["#.#", "###", "###", "#.#", "#.#"],
+  A: [".#.", "#.#", "###", "#.#", "#.#"],
+  K: ["#.#", "##.", "#..", "##.", "#.#"],
+  E: ["###", "#..", "##.", "#..", "###"],
+  R: ["##.", "#.#", "##.", "#.#", "#.#"],
+  2: ["###", "..#", ".##", "#..", "###"],
+  0: [".#.", "#.#", "#.#", "#.#", ".#."],
+  6: [".#.", "#..", "###", "#.#", ".#."],
+  ".": ["...", "...", "...", "...", ".#."],
+  " ": ["...", "...", "...", "...", "..."],
+};
+function text(str, font, x, y, lv) {
+  let cx = x;
+  for (const ch of str) {
+    const g = font[ch];
+    if (!g) { cx += 4; continue; }
+    for (let j = 0; j < g.length; j++)
+      for (let i = 0; i < g[j].length; i++)
+        if (g[j][i] === "#") setCell(cx + i, y + j, lv);
+    cx += g[0].length + 1;
+  }
+}
+
+/* ---- 布局（BOLD MAKER 2026 舞台场景触觉页，比例取自原图） ---- */
+
+// 天花板灯带
+for (const r of [2, 6, 10, 14])
+  for (let x = r % 4 === 2 ? 2 : 4; x < 166; x += 4) setCell(x, r, 2);
+
+// 条纹墙板
+for (let x = 12; x <= 158; x += 14) fillRect(x, 17, 1, 6, 1);
+
+// 灯具桁架
+for (let x = 8; x <= 158; x += 9) fillRect(x, 24, 3, 3, 2);
+fillRect(6, 28, 156, 1, 1);
+
+// 大屏边框
+outlineRect(6, 33, 157, 49, 2);
+
+// 屏角 "360"（原图画幅裁切后可见 "60"）
+text("60", F35, 7, 35, 2);
+
+// 渐变光斑
+const clip = { x0: 7, y0: 34, x1: 161, y1: 81 };
+fillEllipse(27, 45, 18, 7, 2, clip);
+fillEllipse(14, 52, 8, 4, 2, clip);
+
+// 屏上标题
+text("BOLD", F57, 63, 40, 2);
+text("2026", F35, 91, 40, 2);
+text("MAKER", F57, 63, 49, 2);
+for (let x = 63; x <= 99; x += 6) fillRect(x, 57, 4, 2, 2);
+
+// 键帽与光束
+fillRect(141, 46, 27, 23, 0);
+line(144, 55, 149, 49, 1, 2);
+fillRect(149, 49, 15, 1, 2);
+line(163, 49, 161, 55, 1, 2);
+outlineRect(144, 56, 18, 12, 2);
+text("BOLD", F35, 145, 60, 2);
+line(140, 67, 115, 73, 2, 1);
+
+// 圆形舞台（下半部被页框裁切，与原图一致）与地贴字
+ellipseRim(95, 100, 70, 22);
+text("BOLD", F57, 69, 80, 2);
+text("2026", F35, 97, 80, 2);
+text("MAKER", F57, 78, 88, 2);
+for (let x = 45; x <= 141; x += 6) fillRect(x, 96, 4, 2, 2);
+
+// AP 立杆
+fillRect(16, 56, 11, 13, 2);
+fillRect(20, 69, 2, 44, 1);
+
+// 音箱（右音箱遮住舞台右缘，与原图一致）
+outlineRect(1, 83, 14, 30, 1);
+fillRect(4, 92, 6, 8, 2);
+outlineRect(142, 82, 25, 31, 1);
+fillRect(150, 92, 8, 10, 2);
+
+/* ================= 渲染：统一银色金属正方形凸点 ================= */
+
+const PITCH = 12, PIN = 9, BEZEL = 18;
+const FW = (COLS + 2 * MARGIN) * PITCH, FH = (ROWS + 2 * MARGIN) * PITCH;
+const W = FW + 2 * BEZEL, H = FH + 2 * BEZEL;
+
+const C = {
+  bezel: "#2f3236",
+  seam: "rgb(114,116,119)",   // 点之间的底缝
+  flush: "rgb(143,146,150)",  // 平齐基板面
+  l1:    "rgb(185,188,192)",  // 半凸顶面
+  l1hiT: "rgb(214,216,219)", l1hiL: "rgb(205,207,211)",
+  l1shB: "rgb(106,109,112)", l1shR: "rgb(119,121,124)",
+  l2:    "rgb(201,204,208)",  // 全凸顶面
+  l2hiT: "rgb(232,234,236)", l2hiL: "rgb(219,221,224)",
+  l2shB: "rgb(95,98,101)",  l2shR: "rgb(110,112,115)",
+  l2drop:"rgb(80,82,85)"
+};
+
+const cv = document.getElementById("page");
+cv.width = W; cv.height = H;
+const ctx = cv.getContext("2d");
+
+// 机身边框
+ctx.fillStyle = C.bezel;
+ctx.fillRect(0, 0, W, H);
+ctx.fillStyle = "rgba(0,0,0,.5)";
+ctx.fillRect(0, 0, W, 1); ctx.fillRect(0, H - 1, W, 1);
+ctx.fillRect(0, 0, 1, H); ctx.fillRect(W - 1, 0, 1, H);
+ctx.fillStyle = "rgba(255,255,255,.07)";
+ctx.fillRect(2, 2, W - 4, 1); ctx.fillRect(2, 2, 1, H - 4);
+
+// 点阵区的沉陷槽
+const ox = BEZEL, oy = BEZEL;
+ctx.fillStyle = "#17181a";
+ctx.fillRect(ox - 4, oy - 4, FW + 8, 4);
+ctx.fillRect(ox - 4, oy + FH, FW + 8, 4);
+ctx.fillRect(ox - 4, oy, 4, FH);
+ctx.fillRect(ox + FW, oy, 4, FH);
+ctx.fillStyle = "rgba(255,255,255,.10)";
+ctx.fillRect(ox - 4, oy + FH, FW + 8, 1);
+ctx.fillRect(ox + FW, oy, 1, FH);
+
+// 底板
+ctx.fillStyle = C.seam;
+ctx.fillRect(ox, oy, FW, FH);
+
+// 逐点绘制：同尺寸正方形，严格网格，只有高度带来的受光差异
+for (let gy = -MARGIN; gy < ROWS + MARGIN; gy++) {
+  for (let gx = -MARGIN; gx < COLS + MARGIN; gx++) {
+    const inPage = gx >= 0 && gx < COLS && gy >= 0 && gy < ROWS;
+    const lv = inPage ? level[gy * COLS + gx] : 0;
+    const x0 = ox + (gx + MARGIN) * PITCH;
+    const y0 = oy + (gy + MARGIN) * PITCH;
+
+    ctx.fillStyle = C.seam;
+    ctx.fillRect(x0, y0, PITCH, PITCH);
+
+    if (lv === 0) {
+      ctx.fillStyle = C.flush;
+      ctx.fillRect(x0 + 1, y0 + 1, PITCH - 2, PITCH - 2);
+    } else if (lv === 1) {
+      ctx.fillStyle = C.l1;    ctx.fillRect(x0 + 2, y0 + 2, PIN, PIN);
+      ctx.fillStyle = C.l1hiT; ctx.fillRect(x0 + 2, y0 + 2, PIN, 1);
+      ctx.fillStyle = C.l1hiL; ctx.fillRect(x0 + 2, y0 + 2, 1, PIN);
+      ctx.fillStyle = C.l1shB; ctx.fillRect(x0 + 2, y0 + PIN + 1, PIN, 1);
+      ctx.fillStyle = C.l1shR; ctx.fillRect(x0 + PIN + 1, y0 + 2, 1, PIN);
+    } else {
+      ctx.fillStyle = C.l2drop; ctx.fillRect(x0 + 3, y0 + PIN + 2, PIN + 1, 1);
+      ctx.fillStyle = C.l2drop; ctx.fillRect(x0 + PIN + 2, y0 + 3, 1, PIN + 1);
+      ctx.fillStyle = C.l2;    ctx.fillRect(x0 + 2, y0 + 2, PIN, PIN);
+      ctx.fillStyle = C.l2hiT; ctx.fillRect(x0 + 2, y0 + 2, PIN, 2);
+      ctx.fillStyle = C.l2hiL; ctx.fillRect(x0 + 2, y0 + 2, 2, PIN);
+      ctx.fillStyle = C.l2shB; ctx.fillRect(x0 + 2, y0 + PIN, PIN, 2);
+      ctx.fillStyle = C.l2shR; ctx.fillRect(x0 + PIN, y0 + 2, 2, PIN);
+    }
+  }
+}
+
+// 顶部照明的整体光感（全场一致的灯光，不编码任何信息）
+const gTop = ctx.createLinearGradient(0, oy, 0, oy + FH * 0.45);
+gTop.addColorStop(0, "rgba(255,255,255,0.05)");
+gTop.addColorStop(1, "rgba(255,255,255,0)");
+ctx.fillStyle = gTop;
+ctx.fillRect(ox, oy, FW, FH * 0.45);
+
+const gBot = ctx.createLinearGradient(0, oy + FH * 0.55, 0, oy + FH);
+gBot.addColorStop(0, "rgba(0,0,0,0)");
+gBot.addColorStop(1, "rgba(0,0,0,0.07)");
+ctx.fillStyle = gBot;
+ctx.fillRect(ox, oy + FH * 0.55, FW, FH * 0.45);
+</script>
+</body>
+</html>
