@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TouchSight · X5 视觉摄影智能体</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0e1116; --panel: #171c24; --panel2: #1e242e; --line: #2a323f;
+    --text: #e8ecf1; --dim: #8b95a5; --accent: #4da3ff; --green: #3ecf8e;
+    --orange: #ff9f43; --purple: #b07cff; --red: #ff6b6b;
+  }
+  body { background: var(--bg); color: var(--text); font-family: "Microsoft YaHei", "PingFang SC", sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  header { padding: 12px 20px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 14px; background: var(--panel); }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header .sub { color: var(--dim); font-size: 12px; }
+  .status { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--dim); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #555; }
+  .dot.running { background: var(--orange); animation: pulse 1s infinite alternate; }
+  .dot.done { background: var(--green); }
+  .dot.error { background: var(--red); }
+  @keyframes pulse { from { opacity: .4; } to { opacity: 1; } }
+
+  main { flex: 1; display: grid; grid-template-columns: 300px 1fr 340px; gap: 12px; padding: 12px; overflow: hidden; }
+  .col { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  .panel h2 { font-size: 13px; color: var(--dim); font-weight: 600; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
+
+  label { font-size: 12px; color: var(--dim); display: block; margin: 10px 0 4px; }
+  input[type=text], select, textarea { width: 100%; background: var(--panel2); border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; }
+  textarea { resize: vertical; min-height: 60px; }
+  button { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 10px 14px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 12px; font-weight: 600; }
+  button:hover { filter: brightness(1.1); }
+  button:disabled { background: #37404d; cursor: not-allowed; }
+  button.ghost { background: var(--panel2); border: 1px solid var(--line); font-weight: 400; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .chk { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--dim); margin-top: 10px; }
+  .chk input { accent-color: var(--accent); }
+  #micBtn.recording { background: #4d2323; border-color: var(--red); color: var(--red); animation: pulse 1s infinite alternate; }
+
+  /* 全景取景可视化 */
+  #panoWrap { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
+  #panoImg { width: 100%; display: block; opacity: .92; }
+  .frame-box { position: absolute; border: 2px solid var(--orange); border-radius: 3px; box-shadow: 0 0 12px rgba(255,159,67,.5); pointer-events: none; }
+  .frame-box span { position: absolute; top: -18px; left: 0; font-size: 10px; background: var(--orange); color: #000; padding: 1px 5px; border-radius: 3px; white-space: nowrap; font-weight: 700; }
+  .frame-box.final { border-color: var(--green); box-shadow: 0 0 16px rgba(62,207,142,.7); }
+  .frame-box.final span { background: var(--green); }
+  #panoEmpty { color: var(--dim); text-align: center; padding: 40px 10px; font-size: 13px; }
+
+  /* 时间线 */
+  .step { background: var(--panel2); border-left: 3px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; font-size: 13px; animation: fadein .3s; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
+  .step .head { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .step .time { color: var(--dim); font-size: 11px; margin-left: auto; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
+  .tag.think { background: #2b3b55; color: var(--accent); }
+  .tag.tool { background: #3d2f1c; color: var(--orange); }
+  .tag.critique { background: #33254d; color: var(--purple); }
+  .tag.save { background: #173d2e; color: var(--green); }
+  .tag.user { background: #3d1f1f; color: var(--red); }
+  .step .body { white-space: pre-wrap; line-height: 1.6; color: #cfd6e0; }
+  .step .args { font-family: Consolas, monospace; font-size: 11px; color: var(--dim); margin-top: 6px; background: #12161d; padding: 6px 8px; border-radius: 4px; }
+  .thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .thumbs img { height: 90px; border-radius: 5px; border: 1px solid var(--line); cursor: pointer; }
+  .thumbs img:hover { border-color: var(--accent); }
+
+  /* 候选与成片 */
+  .cand { display: flex; gap: 10px; background: var(--panel2); border-radius: 8px; padding: 8px; margin-bottom: 8px; border: 1px solid var(--line); }
+  .cand img { width: 120px; border-radius: 5px; cursor: pointer; }
+  .cand .meta { font-size: 11px; color: var(--dim); line-height: 1.7; }
+  .cand .meta b { color: var(--text); font-size: 12px; }
+  .cand.picked { border-color: var(--green); box-shadow: 0 0 10px rgba(62,207,142,.25); }
+  #finalHero img { width: 100%; border-radius: 8px; border: 2px solid var(--green); }
+  #finalHero .reason { font-size: 12px; color: #cfd6e0; line-height: 1.7; margin-top: 10px; white-space: pre-wrap; }
+  .hist-item { display: flex; gap: 8px; padding: 6px; border-radius: 6px; cursor: pointer; align-items: center; }
+  .hist-item:hover { background: var(--panel2); }
+  .hist-item img { width: 56px; height: 38px; object-fit: cover; border-radius: 4px; }
+  .hist-item .noimg { width: 56px; height: 38px; border-radius: 4px; background: var(--panel2); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--dim); }
+  .hist-item .t { font-size: 11px; color: var(--dim); overflow: hidden; }
+  .hist-item .t b { color: var(--text); font-size: 12px; display: block; }
+
+  /* 弹层 */
+  #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: none; align-items: center; justify-content: center; z-index: 50; cursor: zoom-out; }
+  #lightbox img { max-width: 92vw; max-height: 92vh; border-radius: 8px; }
+  #askModal { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; align-items: center; justify-content: center; z-index: 60; }
+  #askModal .box { background: var(--panel); border: 1px solid var(--accent); border-radius: 10px; padding: 20px; width: 420px; }
+  #askModal .q { font-size: 15px; line-height: 1.6; margin-bottom: 14px; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: #2a323f; border-radius: 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TouchSight 触界影像</h1>
+  <span class="sub">X5 视觉摄影智能体 · 一次快门捕获 360° → Agent 主动取景构图</span>
+  <div class="status"><div class="dot" id="statusDot"></div><span id="statusText">空闲</span></div>
+</header>
+
+<main>
+  <!-- 左：控制台 -->
+  <div class="col">
+    <div class="panel">
+      <h2>拍摄控制台</h2>
+      <label>全景图（input/ 目录；按住 Ctrl 多选 = 连拍批次）</label>
+      <select id="panoSelect" multiple size="4"></select>
+      <input type="file" id="uploadFile" accept=".insp,.jpg,.jpeg,.png" style="display:none">
+      <button class="ghost" id="uploadBtn" style="margin-top:8px">上传影石原片 / 全景图…</button>
+      <div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.6">支持 INSP 原片（自动拼接）、360° JPG / PNG，最大 256 MB；无需连接相机。可先填写拍摄意图，上传完成后自动裁剪构图。</div>
+      <div id="uploadStatus" role="status" aria-live="polite" style="font-size:12px;color:var(--dim);margin-top:6px;line-height:1.6"></div>
+      <label>用户拍摄意图（视障用户说的话）</label>
+      <textarea id="intent" placeholder="例如：帮我们三个人拍一张合照，后面的塔也要留下"></textarea>
+      <button class="ghost" id="micBtn" style="margin-top:8px">🎙 点击说话（语音输入意图）</button>
+      <div class="chk"><input type="checkbox" id="voiceChk" checked><label for="voiceChk" style="margin:0">语音播报（TTS 朗读评选与结果）</label></div>
+      <button id="startBtn">开始拍摄构图（单张）</button>
+      <button id="batchBtn" style="background:var(--purple)">批次：先选最佳时刻再构图</button>
+      <div class="chk"><input type="checkbox" id="mockChk"><label for="mockChk" style="margin:0">演示回放模式（Mock，不消耗 API）</label></div>
+      <button class="ghost" id="watchBtn">监听模式：新照片自动构图</button>
+      <input type="text" id="dcimPath" placeholder="监听目录，分号分隔多个（默认 X5 DCIM 盘 + 摄像头本地夹）" style="margin-top:8px">
+      <div id="watchStatus" style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.6">查询监听状态…</div>
+      <div id="batchCountdown" style="font-size:12px;color:var(--accent);margin-top:4px"></div>
+      <div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.6">
+        服务启动即自动监听。X5 拍完照片后切到 USB 文件传输模式，新照片会自动拼接并进入批次；网络摄像头模式拍的照片同样监听。
+      </div>
+    </div>
+    <div class="panel">
+      <h2>历史运行</h2>
+      <div id="history"></div>
+    </div>
+  </div>
+
+  <!-- 中：球面取景 + Agent 过程 -->
+  <div class="col">
+    <div class="panel">
+      <h2>360° 场景 · Agent 取景轨迹</h2>
+      <div id="panoWrap"><div id="panoEmpty">等待运行…Agent 的每一次取景都会标注在球面上</div><img id="panoImg" style="display:none"></div>
+    </div>
+    <div class="panel" style="flex:1">
+      <h2>Agent 决策过程（观察 → 思考 → 取景 → 评审 → 选片）</h2>
+      <div id="timeline"></div>
+    </div>
+  </div>
+
+  <!-- 右：候选与成片 -->
+  <div class="col">
+    <div class="panel" id="finalPanel" style="display:none">
+      <h2>最终成片</h2>
+      <div id="finalHero"></div>
+    </div>
+    <div class="panel">
+      <h2>候选照片</h2>
+      <div id="candidates"><div style="color:var(--dim);font-size:12px">暂无候选</div></div>
+    </div>
+  </div>
+</main>
+
+<div id="lightbox"><img id="lightboxImg"></div>
+<div id="askModal"><div class="box">
+  <h2 style="margin-bottom:10px;color:var(--accent)">Agent 向你提问</h2>
+  <div class="q" id="askQ"></div>
+  <input type="text" id="askInput" placeholder="输入你的回答…">
+  <button id="askBtn">回答</button>
+</div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+let currentPano = null, frames = [], pickedCandidate = null;
+
+function setStatus(s, text) {
+  const d = $('statusDot');
+  d.className = 'dot ' + (s === 'running' ? 'running' : s === 'done' ? 'done' : s === 'error' ? 'error' : '');
+  $('statusText').textContent = text;
+}
+
+async function loadPanos() {
+  const response = await fetch('/api/panos');
+  if (!response.ok) throw new Error('全景图列表加载失败，请刷新页面重试。');
+  const list = await response.json();
+  $('panoSelect').replaceChildren(...list.map(p => new Option(`${p.name} (${p.size_kb}KB)`, p.name)));
+}
+
+let uploading = false, composing = false;
+function uploadStatus(text, failed = false) {
+  $('uploadStatus').textContent = text;
+  $('uploadStatus').style.color = failed ? 'var(--red)' : 'var(--accent)';
+}
+
+async function startComposition(pano) {
+  if (composing) throw new Error('已有构图任务正在处理，请等它完成后对选中的照片点击“开始拍摄构图”。');
+  composing = true;
+  resetView();
+  try {
+    const intent = $('intent').value.trim() || '为这个场景拍一张最好的照片';
+    const response = await fetch('/api/run', { method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ pano, intent, mock: $('mockChk').checked }) });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || `构图启动失败（HTTP ${response.status}）`);
+  } catch (e) {
+    composing = false;
+    $('startBtn').disabled = false;
+    $('batchBtn').disabled = false;
+    setStatus('error', '构图未启动');
+    throw e;
+  }
+}
+
+$('uploadBtn').onclick = () => $('uploadFile').click();
+$('uploadFile').onchange = async () => {
+  const f = $('uploadFile').files[0]; if (!f || uploading) return;
+  const suffix = f.name.split('.').pop().toLowerCase();
+  if (!['insp', 'jpg', 'jpeg', 'png'].includes(suffix)) {
+    uploadStatus('支持 INSP、JPG、JPEG、PNG；DNG 请先用 Insta360 Studio 导出全景 JPG，视频暂不支持。', true);
+    $('uploadFile').value = '';
+    return;
+  }
+  if (!f.size || f.size > 256 * 1024 * 1024) {
+    uploadStatus(f.size ? '照片超过 256 MB，请导出全景 JPG 后重试。' : '照片文件为空，请重新选择原片。', true);
+    $('uploadFile').value = '';
+    return;
+  }
+  uploading = true;
+  $('uploadBtn').disabled = true;
+  $('uploadBtn').textContent = '上传处理中…';
+  uploadStatus(suffix === 'insp' ? '正在上传并拼接影石原片，请稍候（可能需要数十秒）…' : '正在上传并处理全景照片…');
+  let imported = false;
+  try {
+    const fd = new FormData(); fd.append('file', f);
+    const response = await fetch('/api/upload', { method: 'POST', body: fd });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || `上传失败（HTTP ${response.status}），请重试。`);
+    imported = true;
+    await loadPanos();
+    $('panoSelect').value = result.name;
+    uploadStatus(`${result.source_name} 已导入，正在启动自动裁剪构图…`);
+    await startComposition(result.name);
+    uploadStatus(`${result.source_name} 已启动自动裁剪构图，可在中间查看取景过程。`);
+    speak('照片导入完成，正在自动裁剪构图。');
+  } catch (e) {
+    const prefix = imported ? '照片已导入，但自动构图未启动：' : '上传失败：';
+    uploadStatus(prefix + (e.message || '请检查服务连接后重试。'), true);
+    speak(imported ? '照片已经保存，但构图尚未启动，请查看页面提示。' : '照片上传失败，请查看上传按钮下方的提示。');
+  } finally {
+    uploading = false;
+    $('uploadBtn').disabled = false;
+    $('uploadBtn').textContent = '上传影石原片 / 全景图…';
+    $('uploadFile').value = '';
+  }
+};
+
+$('startBtn').onclick = async () => {
+  if (uploading) { uploadStatus('照片仍在导入，完成后会自动裁剪构图。'); return; }
+  const pano = $('panoSelect').value;
+  if (!pano) { alert('请先选择或上传一张全景图'); return; }
+  try {
+    await startComposition(pano);
+  } catch (e) {
+    uploadStatus(e.message || '构图启动失败，请重试。', true);
+  }
+};
+
+$('batchBtn').onclick = async () => {
+  if (uploading) { uploadStatus('照片仍在导入，请等拼接完成后再开始构图。'); return; }
+  const sel = Array.from($('panoSelect').selectedOptions).map(o => o.value);
+  if (!sel.length) { alert('请先选择全景图（按住 Ctrl 多选 = 多个时刻）'); return; }
+  resetView();
+  const intent = $('intent').value.trim() || '为这个场景拍一张最好的照片';
+  const r = await fetch('/api/batch', { method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ panos: sel, intent, mock: $('mockChk').checked }) });
+  if (!r.ok) { const e = await r.json(); alert(e.error || '启动失败'); $('startBtn').disabled = false; $('batchBtn').disabled = false; }
+};
+
+async function refreshWatchStatus() {
+  try {
+    const s = await (await fetch('/api/watch/status')).json();
+    if (s.watching) {
+      $('watchStatus').innerHTML = `● 监听中：<br>${(s.dirs || []).map(escapeHtml).join('<br>')}`;
+      $('watchStatus').style.color = 'var(--green)';
+      $('watchBtn').textContent = '重新应用监听设置';
+    } else {
+      $('watchStatus').textContent = '未在监听（服务启动时会自动开启；也可手动启动）';
+      $('watchStatus').style.color = 'var(--dim)';
+    }
+    if (!$('dcimPath').value) $('dcimPath').value = (s.dirs && s.dirs.length ? s.dirs : s.default_dirs || []).join(';');
+  } catch (e) { $('watchStatus').textContent = '监听状态查询失败'; }
+}
+
+$('watchBtn').onclick = async () => {
+  const intent = $('intent').value.trim() || '为这个场景拍一张最好的照片';
+  const dcim = $('dcimPath').value.trim();
+  const r = await fetch('/api/watch', { method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ intent, mock: $('mockChk').checked, dcim: dcim || undefined }) });
+  const j = await r.json();
+  setStatus('running', '监听新照片');
+  refreshWatchStatus();
+};
+
+let countdownTimer = null;
+function startCountdown(seconds, count) {
+  let left = Math.round(seconds);
+  clearInterval(countdownTimer);
+  const render = () => { $('batchCountdown').textContent = left > 0 ? `已收 ${count} 张，${left}s 无新照片即开始评选…` : ''; };
+  render();
+  countdownTimer = setInterval(() => { left -= 1; if (left < 0) clearInterval(countdownTimer); render(); }, 1000);
+}
+function stopCountdown() { clearInterval(countdownTimer); $('batchCountdown').textContent = ''; }
+
+function resetView() {
+  $('timeline').innerHTML = ''; $('candidates').innerHTML = '<div style="color:var(--dim);font-size:12px">暂无候选</div>';
+  $('finalPanel').style.display = 'none'; frames = []; pickedCandidate = null;
+  $('panoImg').style.display = 'none'; $('panoEmpty').style.display = 'block';
+  document.querySelectorAll('.frame-box').forEach(e => e.remove());
+  setStatus('running', 'Agent 运行中…');
+  $('startBtn').disabled = true;
+  $('batchBtn').disabled = true;
+}
+
+function addStep(cls, tagText, body, args, images) {
+  const empty = $('timeline').querySelector('.empty'); if (empty) empty.remove();
+  const div = document.createElement('div');
+  div.className = 'step';
+  div.innerHTML = `<div class="head"><span class="tag ${cls}">${tagText}</span><span class="time">${new Date().toLocaleTimeString()}</span></div>
+    <div class="body">${escapeHtml(body || '')}</div>`;
+  if (args) div.innerHTML += `<div class="args">${escapeHtml(args)}</div>`;
+  if (images && images.length) {
+    const t = document.createElement('div'); t.className = 'thumbs';
+    images.filter(u => u).forEach(u => { const i = document.createElement('img'); i.src = u; i.onclick = () => lightbox(u); t.appendChild(i); });
+    div.appendChild(t);
+  }
+  $('timeline').appendChild(div);
+  $('timeline').scrollTop = $('timeline').scrollHeight;
+}
+
+function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function lightbox(u) { $('lightboxImg').src = u; $('lightbox').style.display = 'flex'; }
+$('lightbox').onclick = () => $('lightbox').style.display = 'none';
+
+/* ---------- 语音链路（P8）：TTS 播报 + ASR 语音输入 ---------- */
+const ttsQueue = []; let ttsPlaying = false;
+function speak(text) {
+  if (!text || !$('voiceChk').checked) return;
+  ttsQueue.push(text); pumpTts();
+}
+async function pumpTts() {
+  if (ttsPlaying || !ttsQueue.length) return;
+  ttsPlaying = true;
+  const text = ttsQueue.shift();
+  try {
+    const r = await fetch('/api/tts', { method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ text }) });
+    if (r.ok) {
+      const blob = await r.blob();
+      const audio = new Audio(URL.createObjectURL(blob));
+      audio.onended = audio.onerror = () => { ttsPlaying = false; pumpTts(); };
+      await audio.play();
+    } else { ttsPlaying = false; pumpTts(); }
+  } catch (e) { ttsPlaying = false; pumpTts(); }
+}
+
+let recState = null;  // {ctx, processor, stream, chunks}
+$('micBtn').onclick = async () => {
+  if (recState) { stopRecording(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+    const src = ctx.createMediaStreamSource(stream);
+    const processor = ctx.createScriptProcessor(4096, 1, 1);
+    const chunks = [];
+    processor.onaudioprocess = e => chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+    src.connect(processor); processor.connect(ctx.destination);
+    recState = { ctx, processor, stream, chunks };
+    $('micBtn').classList.add('recording');
+    $('micBtn').textContent = '● 正在录音…点击停止并识别';
+  } catch (e) { alert('无法打开麦克风：' + e.message); }
+};
+function stopRecording() {
+  const { ctx, processor, stream, chunks } = recState; recState = null;
+  processor.disconnect(); stream.getTracks().forEach(t => t.stop());
+  $('micBtn').classList.remove('recording');
+  $('micBtn').textContent = '识别中…';
+  const wav = encodeWav(chunks, ctx.sampleRate);
+  ctx.close();
+  const fd = new FormData();
+  fd.append('audio', new Blob([wav], { type: 'audio/wav' }), 'intent.wav');
+  fetch('/api/asr', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(j => {
+      if (j.text) { $('intent').value = j.text; $('micBtn').textContent = '🎙 ' + j.text.slice(0, 14) + (j.text.length > 14 ? '…' : ''); }
+      else $('micBtn').textContent = '🎙 没听清，点击重说';
+      setTimeout(() => { if (!recState) $('micBtn').textContent = '🎙 点击说话（语音输入意图）'; }, 3000);
+    })
+    .catch(() => { $('micBtn').textContent = '🎙 识别失败，点击重试'; });
+}
+function encodeWav(chunks, sampleRate) {
+  let len = 0; chunks.forEach(c => len += c.length);
+  const pcm = new Float32Array(len); let off = 0;
+  chunks.forEach(c => { pcm.set(c, off); off += c.length; });
+  const buf = new ArrayBuffer(44 + len * 2), v = new DataView(buf);
+  const ws = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  ws(0, 'RIFF'); v.setUint32(4, 36 + len * 2, true); ws(8, 'WAVE'); ws(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sampleRate, true); v.setUint32(28, sampleRate * 2, true);
+  v.setUint16(32, 2, true); v.setUint16(34, 16, true); ws(36, 'data'); v.setUint32(40, len * 2, true);
+  for (let i = 0; i < len; i++) {
+    const s = Math.max(-1, Math.min(1, pcm[i]));
+    v.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+  }
+  return buf;
+}
+
+
+function drawFrame(meta, isFinal) {
+  frames.push({ meta, isFinal });
+  layoutFrames();
+}
+
+function layoutFrames() {
+  const wrap = $('panoWrap'), img = $('panoImg');
+  document.querySelectorAll('.frame-box').forEach(e => e.remove());
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  if (!W || !H || img.style.display === 'none') return;
+  frames.forEach(({ meta, isFinal }) => {
+    const fov = meta.fov || 60, aspect = (meta.width || 4) / (meta.height || 3);
+    const vfov = 2 * Math.atan(Math.tan(fov * Math.PI / 360) / aspect) * 180 / Math.PI;
+    const cx = (meta.yaw + 180) / 360, cy = (90 - meta.pitch) / 180;
+    const x0 = (cx - fov / 720) * W, w = fov / 360 * W;
+    const y0 = (cy - vfov / 360) * H, h = vfov / 180 * H;
+    const mk = (x) => {
+      const b = document.createElement('div');
+      b.className = 'frame-box' + (isFinal ? ' final' : '');
+      b.style.left = x + 'px'; b.style.top = Math.max(0, y0) + 'px';
+      b.style.width = w + 'px'; b.style.height = Math.min(h, H - Math.max(0, y0)) + 'px';
+      b.innerHTML = `<span>${meta.view_id} yaw${meta.yaw}° fov${meta.fov}°</span>`;
+      wrap.appendChild(b);
+    };
+    mk(x0);
+    if (x0 < 0) mk(x0 + W);
+    if (x0 + w > W) mk(x0 - W);
+  });
+}
+$('panoImg').onload = layoutFrames;
+window.addEventListener('resize', layoutFrames);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) layoutFrames(); });
+
+function addCandidate(id, meta, url) {
+  const box = $('candidates');
+  if (box.querySelector('div[style]')) box.innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'cand'; div.id = 'cand_' + id;
+  div.innerHTML = `<img src="${url}" onclick="lightbox('${url}')">
+    <div class="meta"><b>${id}</b><br>yaw ${meta.yaw}° · pitch ${meta.pitch}° · fov ${meta.fov}°<br>${meta.aspect_ratio || ''}<br>${escapeHtml(meta.reason || '')}</div>`;
+  box.appendChild(div);
+}
+
+const evSource = new EventSource('/api/events');
+evSource.onmessage = (msg) => {
+  const ev = JSON.parse(msg.data);
+  const d = ev.data || {};
+  switch (ev.type) {
+    case 'hello':
+      composing = d.status === 'running';
+      $('startBtn').disabled = composing;
+      $('batchBtn').disabled = composing;
+      if (composing) setStatus('running', 'Agent 运行中…');
+      break;
+    case 'panorama_saved':
+      composing = true;
+      $('startBtn').disabled = true;
+      $('batchBtn').disabled = true;
+      currentPano = d.pano;
+      $('panoImg').src = d.pano; $('panoImg').style.display = 'block'; $('panoEmpty').style.display = 'none';
+      break;
+    case 'overview_generated':
+      addStep('tool', '观察', `生成 ${d.length} 张全局观察视图，看完整个球面世界`, null, d.map(v => v.path));
+      break;
+    case 'model_message':
+      if (d.text) addStep('think', '思考', d.text);
+      break;
+    case 'tool_call':
+      if (d.name === 'save_image') pickedCandidate = (d.args || {}).candidate_id;
+      if (d.name && d.name !== 'get_overview_views' && d.name !== 'get_panorama')
+        addStep('tool', '取景 ' + d.name, '', JSON.stringify(d.args || {}, null, 1));
+      break;
+    case 'candidate_rendered':
+      addCandidate(d.view_id, d, `/img/runs/${ev.run_id}/candidates/${d.view_id}.jpg`);
+      drawFrame(d, false);
+      break;
+    case 'tool_result':
+      if (d.name === 'save_image') addStep('save', '选定', d.text);
+      else if (d.name === 'inspect_images') addStep('critique', '比较', d.text, null, d.images);
+      break;
+    case 'ask_user_pending':
+      $('askQ').textContent = d.question; $('askModal').style.display = 'flex'; $('askInput').focus();
+      speak(`我有一个问题想确认。${d.question}`);
+      $('askBtn').onclick = async () => {
+        await fetch('/api/answer', { method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ run_id: ev.run_id, answer: $('askInput').value }) });
+        $('askModal').style.display = 'none'; $('askInput').value = '';
+      };
+      break;
+    case 'ask_user':
+      addStep('user', '用户回答', `Q: ${d.question}\nA: ${d.answer}`);
+      break;
+    case 'final_enhanced':
+      window._enhanced = d;
+      break;
+    case 'run_finished':
+      composing = false;
+      setStatus(d.status === 'done' ? 'done' : 'error', d.status === 'done' ? '完成' : '出错');
+      $('startBtn').disabled = false;
+      $('batchBtn').disabled = false;
+      if (d.status === 'done') speak(`照片拍好了。${d.summary || ''}`);
+      else speak('抱歉，这次拍摄出了问题，请再试一次。');
+      if (pickedCandidate) {
+        frames.forEach(f => { if (f.meta.view_id === pickedCandidate) f.isFinal = true; });
+        layoutFrames();
+        const card = $('cand_' + pickedCandidate);
+        if (card) card.classList.add('picked');
+      }
+      if (d.final) {
+        $('finalPanel').style.display = 'block';
+        let enhHtml = '';
+        if (window._enhanced && window._enhanced.path) {
+          const e = window._enhanced;
+          const paramText = Object.entries(e.params || {}).map(([k, v]) => `${k}=${v}`).join(' ');
+          enhHtml = `<div style="margin-top:10px;border-top:1px solid var(--dim);padding-top:8px">
+            <b style="color:var(--accent)">画质增强版（${e.via === 'mediasdk' ? '影石ISP重出' : 'cv2后处理'}）：</b>
+            <img src="${e.path}" onclick="lightbox('${e.path}')">
+            <div class="reason">${escapeHtml(e.reason || '')}<br><span style="color:var(--dim);font-size:11px">${escapeHtml(paramText)}</span></div></div>`;
+          speak(`已按评审意见优化画质。${e.reason || ''}`);
+        }
+        $('finalHero').innerHTML = `<img src="${d.final}" onclick="lightbox('${d.final}')"><div class="reason"><b style="color:var(--green)">选定理由：</b>${escapeHtml(d.summary || '')}</div>` + enhHtml;
+        window._enhanced = null;
+      }
+      loadHistory();
+      break;
+    case 'watch_new_photo':
+      addStep('tool', '新照片', `检测到新照片：${d.name}（来自 ${d.dir || '?'}），开始导入`);
+      speak('检测到新照片，正在处理。');
+      break;
+    case 'import_progress': {
+      const stageText = { stitching: '拼接全景中…', copying: '复制中…', ok: `导入完成 → ${d.pano_name || ''}`, fail: `导入失败：${d.error || ''}` }[d.stage] || d.stage;
+      addStep(d.stage === 'fail' ? 'critique' : 'tool', '导入', `${d.name} — ${stageText}` + (d.level ? `\n地平线校正：${d.level}` : ''), null, d.pano ? [d.pano] : null);
+      if (d.stage === 'fail') speak('有一张照片导入失败，请查看页面提示。');
+      break;
+    }
+    case 'batch_waiting':
+      startCountdown(d.seconds_left, d.count);
+      break;
+    case 'watch_started':
+      addStep('tool', '监听开启', (d.dirs || []).join('\n') + (d.intent ? `\n意图：${d.intent}` : ''));
+      refreshWatchStatus();
+      break;
+    case 'run_error':
+      addStep('critique', '出错', `[${d.stage || ''}] ${d.message || ''}`);
+      speak('处理过程中出了点问题，请查看页面提示。');
+      break;
+    case 'batch_collected':
+      stopCountdown();
+      setStatus('running', `批次收集完成：${d.count} 个时刻`);
+      addStep('tool', `连拍批次 ×${d.count}`, `收集到 ${d.count} 个时刻的全景照片，开始评选最佳时刻…`, null, d.photos);
+      speak(`收到 ${d.count} 张照片，正在为你评选最佳时刻。`);
+      break;
+    case 'moment_selected':
+      addStep('critique', '选定时刻', `${d.chosen_name} —— ${escapeHtml(d.reason || '')}` +
+        (d.notes && d.notes.length ? '\n' + d.notes.map((n, i) => `时刻${i+1}: ${n}`).join('\n') : ''), null, [d.chosen]);
+      speak(`已为你选定最佳时刻。${d.reason || ''}`);
+      break;
+    case 'batch_skipped':
+      addStep('tool', '批次跳过', d.reason || '');
+      break;
+  }
+};
+
+async function loadHistory() {
+  const list = await (await fetch('/api/runs')).json();
+  $('history').innerHTML = list.map(r => `
+    <div class="hist-item" onclick="showRun('${r.run_id}')">
+      ${r.final ? `<img src="${r.final}">` : '<div class="noimg">无成片</div>'}
+      <div class="t"><b>${r.run_id}</b>${escapeHtml((r.intent || '').slice(0, 24))} · ${r.candidates}候选</div>
+    </div>`).join('') || '<div style="color:var(--dim);font-size:12px">暂无</div>';
+}
+
+async function showRun(runId) {
+  resetView(); setStatus('done', '回放 ' + runId);
+  const trace = await (await fetch(`/api/run/${runId}/trace`)).json();
+  for (const ev of trace) {
+    const d = ev.data || {};
+    if (ev.type === 'user_intent') $('intent').value = d.intent || '';
+    if (ev.type === 'batch_collected') {
+      addStep('tool', `连拍批次 ×${d.count}`, `收集到 ${d.count} 个时刻的全景照片，开始评选最佳时刻…`, null,
+        (d.names || []).map(n => `/img/input/${n}`));
+    }
+    if (ev.type === 'moment_selected') {
+      addStep('critique', '选定时刻', `${d.chosen_name} —— ${escapeHtml(d.reason || '')}` +
+        (d.notes && d.notes.length ? '\n' + d.notes.map((n, i) => `时刻${i+1}: ${n}`).join('\n') : ''), null,
+        d.chosen_name ? [`/img/input/${d.chosen_name}`] : null);
+    }
+    if (ev.type === 'overview_generated') {
+      addStep('tool', '观察', `生成 ${d.length} 张全局观察视图`, null, d.map(v => v.path));
+      const panoUrl = `/img/runs/${runId}/original_panorama.jpg`;
+      $('panoImg').src = panoUrl; $('panoImg').style.display = 'block'; $('panoEmpty').style.display = 'none';
+    }
+    if (ev.type === 'model_message' && d.text) addStep('think', '思考', d.text);
+    if (ev.type === 'tool_call' && d.name === 'save_image') pickedCandidate = (d.args || {}).candidate_id;
+    if (ev.type === 'tool_call' && d.name && !['get_overview_views','get_panorama'].includes(d.name))
+      addStep('tool', '取景 ' + d.name, '', JSON.stringify(d.args || {}, null, 1));
+    if (ev.type === 'candidate_rendered') { addCandidate(d.view_id, d, `/img/runs/${runId}/candidates/${d.view_id}.jpg`); drawFrame(d, false); }
+    if (ev.type === 'tool_result' && d.name === 'save_image') addStep('save', '选定', d.text);
+    if (ev.type === 'tool_result' && d.name === 'inspect_images') addStep('critique', '比较', d.text, null, d.images);
+    if (ev.type === 'final_enhanced') window._enhanced = { path: `/img/runs/${runId}/final_enhanced.jpg`, params: d.params, via: d.via, reason: d.reason };
+    if (ev.type === 'final_decision' && d.final) {
+      if (pickedCandidate) {
+        frames.forEach(f => { if (f.meta.view_id === pickedCandidate) f.isFinal = true; });
+        layoutFrames();
+        const card = $('cand_' + pickedCandidate);
+        if (card) card.classList.add('picked');
+      }
+      const url = `/img/runs/${runId}/final.jpg`;
+      let enhHtml = '';
+      if (window._enhanced && window._enhanced.path) {
+        const e = window._enhanced;
+        const paramText = Object.entries(e.params || {}).map(([k, v]) => `${k}=${v}`).join(' ');
+        enhHtml = `<div style="margin-top:10px;border-top:1px solid var(--dim);padding-top:8px">
+          <b style="color:var(--accent)">画质增强版（${e.via === 'mediasdk' ? '影石ISP重出' : 'cv2后处理'}）：</b>
+          <img src="${e.path}" onclick="lightbox('${e.path}')">
+          <div class="reason">${escapeHtml(e.reason || '')}<br><span style="color:var(--dim);font-size:11px">${escapeHtml(paramText)}</span></div></div>`;
+      }
+      window._enhanced = null;
+      $('finalPanel').style.display = 'block';
+      $('finalHero').innerHTML = `<img src="${url}" onclick="lightbox('${url}')"><div class="reason"><b style="color:var(--green)">选定理由：</b>${escapeHtml(d.summary || '')}</div>` + enhHtml;
+    }
+  }
+  $('startBtn').disabled = false;
+  $('batchBtn').disabled = false;
+}
+
+loadPanos(); loadHistory(); refreshWatchStatus();
+</script>
+</body>
+</html>
